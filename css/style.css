@@ -1,7 +1,7 @@
 @font-face {
     src: url(./fonts/cormorant-garamond-v14-latin-regular.woff2);
     font-family: Cormorant;
-    font-display: optional;
+    font-display: swap;
 }
 
 /* cormorant-garamond-300 - latin */
