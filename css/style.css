@@ -128,3 +128,9 @@ div {
     text-decoration: none;
     background-color: transparent;
 }
+
+
+.responsive {
+  max-width: 100%;
+  height: auto;
+}
