@@ -134,8 +134,6 @@ div {
 
 .responsive {
   width: 70%;
-  min-width: 40px;
-  min-height: 70px;
 }
 
 blockquote.twitter-tweet {
