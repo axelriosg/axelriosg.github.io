@@ -164,3 +164,11 @@ blockquote.twitter-tweet a {
   text-decoration: none;
   outline: 0 none;
 }
+
+body {
+  background-attachment: fixed;
+  background-size: cover;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
