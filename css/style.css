@@ -176,8 +176,8 @@ body {
 /*/* blur(8.9px)*/
 
 .project-card {
-  width: 300px;
-  height: 500px;
+  width: 250px;
+  height: 530px;
   box-shadow: 5px 5px 20px rgb(197, 195, 195);
   padding: 30px;
 }
