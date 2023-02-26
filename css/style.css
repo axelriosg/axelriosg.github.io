@@ -270,5 +270,18 @@ a:link {
 appearance: none;
 }
 
+.main-project a {
+  color: #650707;
+}
 
+.main-project {
+  margin-bottom: 100px;
+  padding: 3rem;
+  font-family: Cormorant;
+  font-weight: 400;
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  background-color: transparent;
+  text-align: left;
+}
 
