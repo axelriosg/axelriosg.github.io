@@ -6,8 +6,8 @@
   if (!thoughts.length || !lattice || !stage) return;
 
   var mobile = window.innerWidth < 720;
-  var HEX_W = mobile ? 228 : 176;
-  var HEX_H = mobile ? 198 : 152;
+  var HEX_W = mobile ? 220 : 180;
+  var HEX_H = Math.round(HEX_W * 0.866);
   var COL_STEP = HEX_W * 0.75;
   var ROW_STEP = HEX_H;
   var TILE_W = 28;
@@ -142,8 +142,7 @@
     var radius = Math.max(stage.clientWidth, stage.clientHeight) * 0.62;
     var t = Math.min(1, dist / radius);
     return {
-      opacity: 1 - t * 0.78,
-      scale: 1 - t * 0.22
+      opacity: Math.max(0.4, 1 - t * 0.55)
     };
   }
 
@@ -154,7 +153,9 @@
       el = document.createElement("button");
       el.type = "button";
       el.className = "hex";
-      el.innerHTML = '<span class="hex__n"></span><p class="hex__text"></p>';
+      el.innerHTML =
+        '<svg class="hex__shape" viewBox="0 0 200 173" aria-hidden="true"><polygon points="50,2 150,2 198,86.5 150,171 50,171 2,86.5"/></svg>' +
+        '<span class="hex__content"><span class="hex__n"></span><p class="hex__text"></p></span>';
       lattice.appendChild(el);
       pool[key] = el;
     }
@@ -177,7 +178,7 @@
     el.style.left = q * COL_STEP + panX + "px";
     el.style.top = r * ROW_STEP + (isOddCol(q) ? HEX_H / 2 : 0) + panY + "px";
     el.style.opacity = String(isActive || rel ? 1 : air.opacity);
-    el.style.transform = "scale(" + (isActive ? 1.06 : air.scale) + ")";
+    el.style.transform = "none";
     el.classList.toggle("is-active", isActive);
     el.classList.toggle("is-related", rel);
     el.classList.toggle("is-dim", !!(active && !isActive && !rel));

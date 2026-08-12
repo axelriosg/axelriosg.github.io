@@ -87,9 +87,9 @@ body.library.is-reading {
 
 .hex {
   position: absolute;
-  width: var(--hex-w, 168px);
-  height: var(--hex-h, 146px);
-  padding: 18% 16% 14%;
+  width: var(--hex-w, 176px);
+  height: var(--hex-h, 152px);
+  padding: 0;
   box-sizing: border-box;
   border: 0;
   margin: 0;
@@ -97,13 +97,24 @@ body.library.is-reading {
   text-align: center;
   cursor: pointer;
   pointer-events: auto;
-  background-color: rgba(255, 255, 255, 0.88);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='white' fill-opacity='0.92' stroke='black' stroke-width='1.2'/></svg>");
-  background-size: 100% 100%;
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  overflow: hidden;
-  transform-origin: center center;
-  will-change: transform, opacity;
+  background: none;
+  overflow: visible;
+}
+
+.hex__shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.hex__shape polygon {
+  fill: #fff;
+  stroke: #111;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
 }
 
 .hex:hover,
@@ -111,24 +122,50 @@ body.library.is-reading {
   z-index: 3;
   outline: none;
   color: #fff;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='black' stroke='black' stroke-width='1.2'/></svg>");
+}
+
+.hex:hover .hex__shape polygon,
+.hex:focus-visible .hex__shape polygon {
+  fill: #111;
 }
 
 .hex.is-related {
   z-index: 4;
   color: #650707;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='%23f7f0ea' stroke='%23650707' stroke-width='2.4'/></svg>");
+}
+
+.hex.is-related .hex__shape polygon {
+  fill: #f7f0ea;
+  stroke: #650707;
+  stroke-width: 2.2;
 }
 
 .hex.is-active,
 .hex.is-active:hover {
   z-index: 5;
   color: #fff;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='black' stroke='black' stroke-width='1.2'/></svg>");
+}
+
+.hex.is-active .hex__shape polygon,
+.hex.is-active:hover .hex__shape polygon {
+  fill: #111;
+  stroke: #111;
 }
 
 .hex.is-dim {
-  filter: grayscale(0.2);
+  filter: none;
+}
+
+.hex__content {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 18%;
+  bottom: 18%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hex__n {
