@@ -224,30 +224,68 @@
     var from = hexCenter(active.q, active.r);
     var links = related[active.index] || [];
     var max = links[0] ? links[0].s : 1;
-    links.forEach(function (link, i) {
+    var ns = "http://www.w3.org/2000/svg";
+
+    function add(el) {
+      linesSvg.appendChild(el);
+    }
+
+    function circle(r, opacity, width) {
+      var c = document.createElementNS(ns, "circle");
+      c.setAttribute("class", "lib-wave");
+      c.setAttribute("cx", from.x);
+      c.setAttribute("cy", from.y);
+      c.setAttribute("r", String(r));
+      c.setAttribute("stroke-width", String(width || 1));
+      c.setAttribute("stroke-opacity", String(opacity));
+      add(c);
+    }
+
+    function arc(r, angle, span, opacity, width) {
+      var a0 = angle - span / 2;
+      var a1 = angle + span / 2;
+      var x0 = from.x + r * Math.cos(a0);
+      var y0 = from.y + r * Math.sin(a0);
+      var x1 = from.x + r * Math.cos(a1);
+      var y1 = from.y + r * Math.sin(a1);
+      var path = document.createElementNS(ns, "path");
+      path.setAttribute("class", "lib-wave");
+      path.setAttribute("d", "M " + x0 + " " + y0 + " A " + r + " " + r + " 0 0 1 " + x1 + " " + y1);
+      path.setAttribute("stroke-width", String(width));
+      path.setAttribute("stroke-opacity", String(opacity));
+      add(path);
+    }
+
+    circle(26, 0.22, 1);
+    circle(52, 0.16, 1);
+    circle(84, 0.1, 1);
+
+    links.forEach(function (link) {
       var copy = nearestCopy(link.j, active.q, active.r);
       var to = hexCenter(copy.q, copy.r);
-      var mx = (from.x + to.x) / 2;
-      var my = (from.y + to.y) / 2;
       var dx = to.x - from.x;
       var dy = to.y - from.y;
-      var bend = (i % 2 === 0 ? 1 : -1) * 0.16;
-      var d =
-        "M " + from.x + " " + from.y +
-        " Q " + (mx - dy * bend) + " " + (my + dx * bend) +
-        " " + to.x + " " + to.y;
-      var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("class", "lib-line");
-      path.setAttribute("d", d);
-      path.setAttribute("stroke-width", String(1.1 + (link.s / max) * 1.4));
-      path.setAttribute("stroke-opacity", String(0.45 + (link.s / max) * 0.45));
-      linesSvg.appendChild(path);
-      var node = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var angle = Math.atan2(dy, dx);
+      var strength = link.s / max;
+      [0.32, 0.55, 0.78].forEach(function (t, i) {
+        arc(dist * t, angle, 0.95 - i * 0.12, 0.28 + strength * 0.45, 1.2 + strength);
+      });
+      var beam = document.createElementNS(ns, "line");
+      beam.setAttribute("class", "lib-line");
+      beam.setAttribute("x1", from.x);
+      beam.setAttribute("y1", from.y);
+      beam.setAttribute("x2", to.x);
+      beam.setAttribute("y2", to.y);
+      beam.setAttribute("stroke-width", String(0.7 + strength * 0.8));
+      beam.setAttribute("stroke-opacity", String(0.18 + strength * 0.25));
+      add(beam);
+      var node = document.createElementNS(ns, "circle");
       node.setAttribute("class", "lib-node");
       node.setAttribute("cx", to.x);
       node.setAttribute("cy", to.y);
-      node.setAttribute("r", "3.2");
-      linesSvg.appendChild(node);
+      node.setAttribute("r", "3.4");
+      add(node);
     });
   }
 
@@ -296,7 +334,7 @@
   tick();
 
   stage.addEventListener("pointerdown", function (event) {
-    if (event.target.closest(".volume") || event.target.closest(".lib-back")) return;
+    if (event.target.closest(".volume") || event.target.closest(".lib-top")) return;
     dragging = true;
     moved = false;
     document.body.classList.add("is-dragging");
