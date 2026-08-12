@@ -93,25 +93,115 @@
     });
   });
 
-  var related = thoughts.map(function (_, i) {
-    var a = tokenSets[i];
-    var scored = [];
-    for (var j = 0; j < COUNT; j++) {
-      if (j === i) continue;
-      var b = tokenSets[j];
-      var score = 0;
-      var hits = 0;
-      for (var w in a) {
-        if (b[w]) {
-          hits += 1;
-          score += 1 / (df[w] || 1);
+  var NAME = {
+    ia: "AGI",
+    amor: "love",
+    inteligencia: "intelligence",
+    perro: "dogs",
+    libro: "books",
+    muerte: "death",
+    extraterrestre: "aliens",
+    lenguaje: "language",
+    dios: "God",
+    vida: "life",
+    humano: "humans",
+    latenscracia: "Latenscracia"
+  };
+
+  function isEnglish(text) {
+    return !/[áéíóúñ¿¡]/i.test(text) && !/\b(que|los|las|una|para|como|por|del)\b/i.test(text);
+  }
+
+  function doorsAt(q, r) {
+    var thought = thoughtAt(q, r);
+    var i = thought.n - 1;
+    var used = {};
+    used[i] = true;
+    var doors = [];
+    var rare = Object.keys(tokenSets[i]).sort(function (a, b) {
+      return (df[a] || 99) - (df[b] || 99);
+    });
+
+    var nq = q + 1;
+    var neighbor = thoughtAt(nq, r);
+    if (!used[neighbor.n - 1]) {
+      used[neighbor.n - 1] = true;
+      doors.push({
+        j: neighbor.n - 1,
+        q: nq,
+        r: r,
+        kind: "the next gallery",
+        why: "the hexagon beside this one"
+      });
+    }
+
+    var theme = rare[0];
+    if (theme && doors.length < 3) {
+      var best = -1;
+      var bestLen = 0;
+      for (var j = 0; j < COUNT; j++) {
+        if (used[j] || !tokenSets[j][theme]) continue;
+        if (thoughts[j].text.length > bestLen) {
+          best = j;
+          bestLen = thoughts[j].text.length;
         }
       }
-      if (hits >= 2 || score >= 0.35) scored.push({ j: j, s: score, hits: hits });
+      if (best >= 0) {
+        used[best] = true;
+        var copy = nearestCopy(best, q, r);
+        doors.push({
+          j: best,
+          q: copy.q,
+          r: copy.r,
+          kind: "a commentary",
+          why: "both speak of " + (NAME[theme] || theme)
+        });
+      }
     }
-    scored.sort(function (x, y) { return y.s - x.s; });
-    return scored.slice(0, 5);
-  });
+
+    if (doors.length < 3) {
+      var srcEn = isEnglish(thoughts[i].text);
+      var trans = -1;
+      var transWord = "";
+      for (var k = 0; k < rare.length && trans < 0; k++) {
+        var w = rare[k];
+        for (var j = 0; j < COUNT; j++) {
+          if (used[j] || !tokenSets[j][w]) continue;
+          if (isEnglish(thoughts[j].text) !== srcEn) {
+            trans = j;
+            transWord = w;
+            break;
+          }
+        }
+      }
+      if (trans >= 0) {
+        var copyT = nearestCopy(trans, q, r);
+        doors.push({
+          j: trans,
+          q: copyT.q,
+          r: copyT.r,
+          kind: "the other tongue",
+          why: "the same idea in another language"
+        });
+      } else if (rare[1]) {
+        var theme2 = rare[1];
+        for (var j = 0; j < COUNT; j++) {
+          if (used[j] || !tokenSets[j][theme2]) continue;
+          var copy2 = nearestCopy(j, q, r);
+          doors.push({
+            j: j,
+            q: copy2.q,
+            r: copy2.r,
+            kind: "another volume",
+            why: "both speak of " + (NAME[theme2] || theme2)
+          });
+          break;
+        }
+      }
+    }
+
+    return doors.slice(0, 3);
+  }
 
   function thoughtAt(q, r) {
     var qq = ((q % TILE_W) + TILE_W) % TILE_W;
@@ -195,11 +285,10 @@
     var air = atmosphere(q, r);
     var isActive = !!(active && active.q === q && active.r === r);
     var rel = false;
-    if (active) {
-      var wanted = related[active.index] || [];
-      for (var i = 0; i < wanted.length; i++) {
-        var copy = nearestCopy(wanted[i].j, active.q, active.r);
-        if (copy.q === q && copy.r === r) rel = true;
+    if (active && active.doors) {
+      for (var i = 0; i < active.doors.length; i++) {
+        var door = active.doors[i];
+        if (door.q === q && door.r === r) rel = true;
       }
     }
     el.dataset.q = String(q);
@@ -220,72 +309,26 @@
 
   function drawLines() {
     while (linesSvg.firstChild) linesSvg.removeChild(linesSvg.firstChild);
-    if (!active) return;
+    if (!active || !active.doors) return;
     var from = hexCenter(active.q, active.r);
-    var links = related[active.index] || [];
-    var max = links[0] ? links[0].s : 1;
     var ns = "http://www.w3.org/2000/svg";
-
-    function add(el) {
-      linesSvg.appendChild(el);
-    }
-
-    function circle(r, opacity, width) {
-      var c = document.createElementNS(ns, "circle");
-      c.setAttribute("class", "lib-wave");
-      c.setAttribute("cx", from.x);
-      c.setAttribute("cy", from.y);
-      c.setAttribute("r", String(r));
-      c.setAttribute("stroke-width", String(width || 1));
-      c.setAttribute("stroke-opacity", String(opacity));
-      add(c);
-    }
-
-    function arc(r, angle, span, opacity, width) {
-      var a0 = angle - span / 2;
-      var a1 = angle + span / 2;
-      var x0 = from.x + r * Math.cos(a0);
-      var y0 = from.y + r * Math.sin(a0);
-      var x1 = from.x + r * Math.cos(a1);
-      var y1 = from.y + r * Math.sin(a1);
-      var path = document.createElementNS(ns, "path");
-      path.setAttribute("class", "lib-wave");
-      path.setAttribute("d", "M " + x0 + " " + y0 + " A " + r + " " + r + " 0 0 1 " + x1 + " " + y1);
-      path.setAttribute("stroke-width", String(width));
-      path.setAttribute("stroke-opacity", String(opacity));
-      add(path);
-    }
-
-    circle(26, 0.22, 1);
-    circle(52, 0.16, 1);
-    circle(84, 0.1, 1);
-
-    links.forEach(function (link) {
-      var copy = nearestCopy(link.j, active.q, active.r);
-      var to = hexCenter(copy.q, copy.r);
-      var dx = to.x - from.x;
-      var dy = to.y - from.y;
-      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      var angle = Math.atan2(dy, dx);
-      var strength = link.s / max;
-      [0.32, 0.55, 0.78].forEach(function (t, i) {
-        arc(dist * t, angle, 0.95 - i * 0.12, 0.28 + strength * 0.45, 1.2 + strength);
-      });
-      var beam = document.createElementNS(ns, "line");
-      beam.setAttribute("class", "lib-line");
-      beam.setAttribute("x1", from.x);
-      beam.setAttribute("y1", from.y);
-      beam.setAttribute("x2", to.x);
-      beam.setAttribute("y2", to.y);
-      beam.setAttribute("stroke-width", String(0.7 + strength * 0.8));
-      beam.setAttribute("stroke-opacity", String(0.18 + strength * 0.25));
-      add(beam);
+    active.doors.forEach(function (door) {
+      var to = hexCenter(door.q, door.r);
+      var line = document.createElementNS(ns, "line");
+      line.setAttribute("class", "lib-line");
+      line.setAttribute("x1", from.x);
+      line.setAttribute("y1", from.y);
+      line.setAttribute("x2", to.x);
+      line.setAttribute("y2", to.y);
+      line.setAttribute("stroke-width", "1.15");
+      line.setAttribute("stroke-opacity", "0.7");
+      linesSvg.appendChild(line);
       var node = document.createElementNS(ns, "circle");
       node.setAttribute("class", "lib-node");
       node.setAttribute("cx", to.x);
       node.setAttribute("cy", to.y);
-      node.setAttribute("r", "3.4");
-      add(node);
+      node.setAttribute("r", "3");
+      linesSvg.appendChild(node);
     });
   }
 
@@ -304,9 +347,8 @@
     }
     if (active) {
       needed[active.q + ":" + active.r] = 1;
-      (related[active.index] || []).forEach(function (link) {
-        var copy = nearestCopy(link.j, active.q, active.r);
-        needed[copy.q + ":" + copy.r] = 1;
+      (active.doors || []).forEach(function (door) {
+        needed[door.q + ":" + door.r] = 1;
       });
     }
     Object.keys(pool).forEach(function (key) {
@@ -371,23 +413,33 @@
 
   function openAt(q, r) {
     var thought = thoughtAt(q, r);
-    active = { q: q, r: r, index: thought.n - 1 };
+    active = { q: q, r: r, index: thought.n - 1, doors: doorsAt(q, r) };
     document.body.classList.add("is-reading");
     volumeN.textContent = "hexagon " + thought.n + " / " + COUNT;
     volumeText.textContent = thought.text;
-    var rel = related[active.index] || [];
     volumeRelated.innerHTML = "";
-    rel.forEach(function (link) {
+    if (active.doors.length) {
+      var lead = document.createElement("li");
+      lead.className = "doors-lead";
+      lead.textContent = "this gallery opens onto";
+      volumeRelated.appendChild(lead);
+    }
+    active.doors.forEach(function (door) {
       var item = document.createElement("li");
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.textContent = excerpt(thoughts[link.j].text);
+      btn.innerHTML =
+        '<span class="door-kind"></span>' +
+        '<span class="door-why"></span>' +
+        '<span class="door-text"></span>';
+      btn.querySelector(".door-kind").textContent = door.kind;
+      btn.querySelector(".door-why").textContent = door.why;
+      btn.querySelector(".door-text").textContent = excerpt(thoughts[door.j].text);
       btn.addEventListener("click", function (event) {
         event.stopPropagation();
-        var copy = nearestCopy(link.j, active.q, active.r);
-        targetX += (active.q - copy.q) * COL_STEP;
-        targetY += (active.r - copy.r) * ROW_STEP;
-        openAt(copy.q, copy.r);
+        targetX += (active.q - door.q) * COL_STEP;
+        targetY += (active.r - door.r) * ROW_STEP;
+        openAt(door.q, door.r);
       });
       item.appendChild(btn);
       volumeRelated.appendChild(item);
