@@ -4,26 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>The Library</title>
+  <title>Axel Rios — The Library</title>
   <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/library.css" />
 </head>
-<body>
-  <div class="vignette" aria-hidden="true"></div>
-  <header class="lib-bar">
-    <p class="lib-epigraph">I declare that the Library is endless.</p>
-    <a class="lib-back" href="brain.html">the catalogue</a>
+<body class="library">
+  <header class="lib-brand">
+    <center>
+      <h1 class="main-nav__title"> Axel Rios </h1>
+      <div class="gradient"></div>
+    </center>
+    <center>
+      <nav>
+        <ul class="main-barrita">
+          <li class="main-nav__title"><a href="index.html">Home</a></li>
+          <li class="main-nav__title"><a href="index.html#Essays">Essays</a></li>
+          <li class="main-nav__title"><a href="index.html#Projects">Projects</a></li>
+        </ul>
+      </nav>
+    </center>
   </header>
-  <div id="lattice" class="lattice"></div>
-  <p class="lib-hint">drag · click a hexagon</p>
+
+  <div class="lib-stage">
+    <svg class="lib-lines" id="lines" aria-hidden="true"></svg>
+    <div id="lattice" class="lattice"></div>
+  </div>
+
+  <p class="lib-hint">The library is unlimited and cyclical · 568 hexagons, repeating without end</p>
+
   <aside class="volume" id="volume" hidden>
     <p class="volume__n" id="volume-n"></p>
     <p class="volume__text" id="volume-text"></p>
+    <p class="volume__related" id="volume-related"></p>
     <button class="volume__close" id="volume-close" type="button">close</button>
   </aside>
+
   <script src="js/aphorisms.js"></script>
   <script src="js/library.js"></script>
 </body>
