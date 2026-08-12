@@ -285,3 +285,35 @@ appearance: none;
   text-align: left;
 }
 
+.secret-wrap {
+  text-align: center;
+  margin: 2.5rem 0 3.5rem;
+}
+
+.secret-gate {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  color: #111;
+  text-decoration: none;
+  font-family: Cinzel, serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.48em;
+  text-transform: lowercase;
+}
+
+.secret-gate__hex {
+  width: 88px;
+  height: 76px;
+  background: #111;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  transition: transform 0.7s ease, background 0.7s ease;
+}
+
+.secret-gate:hover .secret-gate__hex,
+.secret-gate:focus .secret-gate__hex {
+  transform: rotate(30deg);
+  background: #650707;
+}
+

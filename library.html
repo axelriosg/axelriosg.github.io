@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>The Library</title>
+  <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/library.css" />
+</head>
+<body>
+  <div class="vignette" aria-hidden="true"></div>
+  <header class="lib-bar">
+    <p class="lib-epigraph">I declare that the Library is endless.</p>
+    <a class="lib-back" href="brain.html">the catalogue</a>
+  </header>
+  <div id="lattice" class="lattice"></div>
+  <p class="lib-hint">drag · click a hexagon</p>
+  <aside class="volume" id="volume" hidden>
+    <p class="volume__n" id="volume-n"></p>
+    <p class="volume__text" id="volume-text"></p>
+    <button class="volume__close" id="volume-close" type="button">close</button>
+  </aside>
+  <script src="js/aphorisms.js"></script>
+  <script src="js/library.js"></script>
+</body>
+</html>
