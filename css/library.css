@@ -1,46 +1,77 @@
-body.library {
+html, body.library {
   margin: 0;
-  min-height: 100%;
+  height: 100%;
   overflow: hidden;
   background: #fff;
   color: #111;
   cursor: grab;
   display: block;
+  font-family: "Cormorant Garamond", serif;
+  touch-action: none;
 }
 
 body.library.is-dragging {
   cursor: grabbing;
 }
 
-body.library .lib-brand {
-  position: relative;
-  z-index: 5;
-  background: #fff;
+body.library.is-reading {
+  cursor: default;
 }
 
-body.library .lib-brand .main-barrita {
-  margin-top: 8px;
-  margin-bottom: 18px;
+.lib-back {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  z-index: 8;
+  min-height: 44px;
+  padding: 0.55rem 0.2rem;
+  color: #111;
+  text-decoration: none;
+  font-family: Cinzel, serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }
 
-body.library .lib-brand .gradient {
-  height: 56px;
+.lib-back:hover {
+  text-decoration: underline;
+}
+
+.lib-name {
+  position: fixed;
+  top: max(1.05rem, env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  z-index: 7;
+  margin: 0;
+  text-align: center;
+  font-family: Cinzel, serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  pointer-events: none;
+}
+
+.lib-lamp {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(circle closest-side, rgb(0, 0, 0), #ffffff);
+  opacity: 0.16;
 }
 
 .lib-stage {
   position: fixed;
   inset: 0;
-  top: 148px;
+  z-index: 2;
   overflow: hidden;
-  background: #fff;
+  background: transparent;
 }
 
 .lattice {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
 }
 
@@ -56,9 +87,9 @@ body.library .lib-brand .gradient {
 
 .hex {
   position: absolute;
-  width: 148px;
-  height: 128px;
-  padding: 22px 26px 18px;
+  width: var(--hex-w, 168px);
+  height: var(--hex-h, 146px);
+  padding: 18% 16% 14%;
   box-sizing: border-box;
   border: 0;
   margin: 0;
@@ -66,54 +97,59 @@ body.library .lib-brand .gradient {
   text-align: center;
   cursor: pointer;
   pointer-events: auto;
-  background-color: #fff;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='white' stroke='black' stroke-width='1.35'/></svg>");
+  background-color: rgba(255, 255, 255, 0.88);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='white' fill-opacity='0.92' stroke='black' stroke-width='1.2'/></svg>");
   background-size: 100% 100%;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
   overflow: hidden;
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
 .hex:hover,
 .hex:focus-visible {
   z-index: 3;
   outline: none;
-  background-color: #111;
   color: #fff;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='black' stroke='black' stroke-width='1.35'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='black' stroke='black' stroke-width='1.2'/></svg>");
 }
 
 .hex.is-related {
-  z-index: 3;
+  z-index: 4;
   color: #650707;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='%23f7f0ea' stroke='%23650707' stroke-width='2.2'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='%23f7f0ea' stroke='%23650707' stroke-width='2.4'/></svg>");
 }
 
 .hex.is-active,
 .hex.is-active:hover {
-  z-index: 4;
+  z-index: 5;
   color: #fff;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='black' stroke='black' stroke-width='1.35'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 173'><polygon points='50,2 150,2 198,86.5 150,171 50,171 2,86.5' fill='black' stroke='black' stroke-width='1.2'/></svg>");
+}
+
+.hex.is-dim {
+  filter: grayscale(0.2);
 }
 
 .hex__n {
   display: block;
   font-family: Cinzel, serif;
-  font-size: 0.52rem;
+  font-size: 0.58rem;
   letter-spacing: 0.18em;
-  opacity: 0.45;
-  margin-bottom: 0.2rem;
+  opacity: 0.42;
+  margin-bottom: 0.25rem;
 }
 
 .hex.is-active .hex__n,
 .hex:hover .hex__n {
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .hex__text {
   margin: 0;
-  font-family: "Cormorant Garamond", Cormorant, serif;
-  font-size: 0.64rem;
-  line-height: 1.22;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 0.72rem;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
@@ -122,33 +158,34 @@ body.library .lib-brand .gradient {
 
 .lib-hint {
   position: fixed;
-  bottom: 0.9rem;
+  bottom: max(0.8rem, env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  z-index: 5;
+  z-index: 7;
   text-align: center;
   margin: 0;
   font-family: Cinzel, serif;
   font-size: 0.58rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #111;
-  opacity: 0.45;
+  opacity: 0.38;
   pointer-events: none;
 }
 
 .volume {
   position: fixed;
   left: 50%;
-  bottom: 3.2rem;
+  bottom: max(3.4rem, calc(env(safe-area-inset-bottom) + 2.6rem));
   transform: translateX(-50%);
-  z-index: 6;
-  width: min(36rem, calc(100% - 2rem));
-  padding: 1.6rem 1.8rem 1.3rem;
+  z-index: 8;
+  width: min(38rem, calc(100% - 2rem));
+  max-height: min(58vh, 28rem);
+  overflow: auto;
+  padding: 1.7rem 1.9rem 1.4rem;
   background: #fff;
   border: 1px solid #111;
   text-align: center;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
 }
 
 .volume[hidden] {
@@ -160,18 +197,18 @@ body.library .lib-brand .gradient {
   font-size: 0.68rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.9rem;
 }
 
 .volume__text {
-  font-family: "Cormorant Garamond", Cormorant, serif;
-  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.2rem, 2.4vw, 1.7rem);
   line-height: 1.4;
   margin: 0;
 }
 
 .volume__related {
-  margin: 1rem 0 0;
+  margin: 1.1rem 0 0;
   font-family: Cinzel, serif;
   font-size: 0.62rem;
   letter-spacing: 0.12em;
@@ -183,7 +220,8 @@ body.library .lib-brand .gradient {
   appearance: none;
   background: none;
   border: 0;
-  padding: 0 0.35rem;
+  padding: 0.35rem 0.4rem;
+  min-height: 44px;
   color: #650707;
   font: inherit;
   letter-spacing: inherit;
@@ -197,7 +235,8 @@ body.library .lib-brand .gradient {
   appearance: none;
   background: none;
   border: 0;
-  padding: 0;
+  padding: 0.4rem 0.2rem;
+  min-height: 44px;
   color: #111;
   font-family: Cinzel, serif;
   font-size: 0.62rem;
@@ -213,12 +252,61 @@ body.library .lib-brand .gradient {
 .lib-line {
   fill: none;
   stroke: #650707;
-  stroke-width: 1.1;
-  stroke-opacity: 0.85;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-dasharray: 7 9;
+  animation: lib-flow 14s linear infinite;
 }
 
-@media (max-width: 700px) {
-  .lib-stage {
-    top: 132px;
+@keyframes lib-flow {
+  to { stroke-dashoffset: -160; }
+}
+
+@media (max-width: 720px) {
+  .lib-name {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+  }
+
+  .lib-back {
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+  }
+
+  .hex__n {
+    font-size: 0.7rem;
+  }
+
+  .hex__text {
+    font-size: 0.92rem;
+    -webkit-line-clamp: 6;
+  }
+
+  .lib-hint {
+    display: none;
+  }
+
+  .volume {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: auto;
+    max-height: 62vh;
+    padding: 1.4rem 1.2rem max(1.4rem, env(safe-area-inset-bottom));
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .volume__text {
+    font-size: 1.28rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lib-line {
+    animation: none;
+    stroke-dasharray: none;
   }
 }

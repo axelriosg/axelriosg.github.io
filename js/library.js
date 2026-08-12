@@ -1,17 +1,21 @@
 (function () {
   var thoughts = window.APHORISMS || [];
   var lattice = document.getElementById("lattice");
-  var stage = document.querySelector(".lib-stage");
+  var stage = document.getElementById("stage");
   var linesSvg = document.getElementById("lines");
   if (!thoughts.length || !lattice || !stage) return;
 
-  var HEX_W = 148;
-  var HEX_H = 128;
+  var mobile = window.innerWidth < 720;
+  var HEX_W = mobile ? 228 : 176;
+  var HEX_H = mobile ? 198 : 152;
   var COL_STEP = HEX_W * 0.75;
   var ROW_STEP = HEX_H;
   var TILE_W = 28;
   var TILE_H = 21;
   var COUNT = thoughts.length;
+
+  document.documentElement.style.setProperty("--hex-w", HEX_W + "px");
+  document.documentElement.style.setProperty("--hex-h", HEX_H + "px");
 
   var STOP = {
     that: 1, this: 1, with: 1, from: 1, have: 1, were: 1, been: 1, they: 1,
@@ -24,10 +28,10 @@
     unos: 1, unas: 1, del: 1, las: 1, los: 1, que: 1, con: 1, sin: 1,
     sobre: 1, entre: 1, hasta: 1, desde: 1, todo: 1, toda: 1, todos: 1,
     todas: 1, algo: 1, alguien: 1, nada: 1, nunca: 1, siempre: 1, muy: 1,
-    mas: 1, menos: 1, bien: 1, mal: 1, hay: 1, ser: 1, son: 1, esta: 1,
+    mas: 1, menos: 1, bien: 1, mal: 1, hay: 1, ser: 1, son: 1,
     estan: 1, tiene: 1, tienen: 1, hacer: 1, hace: 1, puede: 1, pueden: 1,
     debe: 1, debes: 1, cada: 1, otro: 1, otra: 1, otros: 1, otras: 1,
-    mismo: 1, misma: 1, mejor: 1, peor: 1, gran: 1, gran: 1, after: 1,
+    mismo: 1, misma: 1, mejor: 1, peor: 1, gran: 1, after: 1,
     before: 1, being: 1, will: 1, dont: 1, isnt: 1, arent: 1, was: 1,
     are: 1, and: 1, the: 1, for: 1, not: 1, you: 1, all: 1, but: 1,
     his: 1, her: 1, she: 1, him: 1, who: 1, how: 1, our: 1, out: 1,
@@ -35,8 +39,9 @@
   };
 
   function excerpt(text) {
-    if (text.length <= 110) return text;
-    return text.slice(0, 110).replace(/\s+\S*$/, "") + "…";
+    var max = mobile ? 150 : 120;
+    if (text.length <= max) return text;
+    return text.slice(0, max).replace(/\s+\S*$/, "") + "…";
   }
 
   function pad(n) {
@@ -106,15 +111,19 @@
     return { q: bestQ, r: bestR };
   }
 
+  function isOddCol(q) {
+    return ((q % 2) + 2) % 2 === 1;
+  }
+
   function hexCenter(q, r) {
     return {
       x: q * COL_STEP + HEX_W / 2 + panX,
-      y: r * ROW_STEP + (Math.abs(q) % 2 ? HEX_H / 2 : 0) + HEX_H / 2 + panY
+      y: r * ROW_STEP + (isOddCol(q) ? HEX_H / 2 : 0) + HEX_H / 2 + panY
     };
   }
 
-  var panX = stage.clientWidth / 2 - (TILE_W * COL_STEP) / 2;
-  var panY = stage.clientHeight / 2 - (TILE_H * ROW_STEP) / 2;
+  var panX = stage.clientWidth / 2 - HEX_W / 2;
+  var panY = stage.clientHeight / 2 - HEX_H / 2;
   var targetX = panX;
   var targetY = panY;
   var dragging = false;
@@ -124,6 +133,19 @@
   var active = null;
   var pool = {};
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function atmosphere(q, r) {
+    var c = hexCenter(q, r);
+    var dx = c.x - stage.clientWidth / 2;
+    var dy = c.y - stage.clientHeight / 2;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var radius = Math.max(stage.clientWidth, stage.clientHeight) * 0.62;
+    var t = Math.min(1, dist / radius);
+    return {
+      opacity: 1 - t * 0.78,
+      scale: 1 - t * 0.22
+    };
+  }
 
   function ensureHex(q, r) {
     var key = q + ":" + r;
@@ -137,14 +159,8 @@
       pool[key] = el;
     }
     var thought = thoughtAt(q, r);
-    el.dataset.q = String(q);
-    el.dataset.r = String(r);
-    el.dataset.index = String(thought.n - 1);
-    el.querySelector(".hex__n").textContent = pad(thought.n);
-    el.querySelector(".hex__text").textContent = excerpt(thought.text);
-    el.style.left = q * COL_STEP + panX + "px";
-    el.style.top = r * ROW_STEP + (Math.abs(q) % 2 ? HEX_H / 2 : 0) + panY + "px";
-    el.classList.toggle("is-active", !!(active && active.q === q && active.r === r));
+    var air = atmosphere(q, r);
+    var isActive = !!(active && active.q === q && active.r === r);
     var rel = false;
     if (active) {
       var wanted = related[active.index] || [];
@@ -153,7 +169,18 @@
         if (copy.q === q && copy.r === r) rel = true;
       }
     }
+    el.dataset.q = String(q);
+    el.dataset.r = String(r);
+    el.dataset.index = String(thought.n - 1);
+    el.querySelector(".hex__n").textContent = pad(thought.n);
+    el.querySelector(".hex__text").textContent = excerpt(thought.text);
+    el.style.left = q * COL_STEP + panX + "px";
+    el.style.top = r * ROW_STEP + (isOddCol(q) ? HEX_H / 2 : 0) + panY + "px";
+    el.style.opacity = String(isActive || rel ? 1 : air.opacity);
+    el.style.transform = "scale(" + (isActive ? 1.06 : air.scale) + ")";
+    el.classList.toggle("is-active", isActive);
     el.classList.toggle("is-related", rel);
+    el.classList.toggle("is-dim", !!(active && !isActive && !rel));
     el._used = true;
     return el;
   }
@@ -162,8 +189,7 @@
     while (linesSvg.firstChild) linesSvg.removeChild(linesSvg.firstChild);
     if (!active) return;
     var from = hexCenter(active.q, active.r);
-    var wanted = related[active.index] || [];
-    wanted.forEach(function (idx) {
+    (related[active.index] || []).forEach(function (idx) {
       var copy = nearestCopy(idx, active.q, active.r);
       var to = hexCenter(copy.q, copy.r);
       var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -221,7 +247,7 @@
   tick();
 
   stage.addEventListener("pointerdown", function (event) {
-    if (event.target.closest(".volume")) return;
+    if (event.target.closest(".volume") || event.target.closest(".lib-back")) return;
     dragging = true;
     moved = false;
     document.body.classList.add("is-dragging");
@@ -233,7 +259,7 @@
     if (!dragging) return;
     var dx = event.clientX - lastX;
     var dy = event.clientY - lastY;
-    if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+    if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
     targetX += dx;
     targetY += dy;
     lastX = event.clientX;
@@ -259,6 +285,7 @@
   function openAt(q, r) {
     var thought = thoughtAt(q, r);
     active = { q: q, r: r, index: thought.n - 1 };
+    document.body.classList.add("is-reading");
     volumeN.textContent = "hexagon " + thought.n + " / " + COUNT;
     volumeText.textContent = thought.text;
     var rel = related[active.index] || [];
@@ -285,6 +312,7 @@
   function closeVolume() {
     active = null;
     volume.hidden = true;
+    document.body.classList.remove("is-reading");
   }
 
   lattice.addEventListener("click", function (event) {
@@ -294,7 +322,10 @@
     openAt(Number(hex.dataset.q), Number(hex.dataset.r));
   });
 
-  document.getElementById("volume-close").addEventListener("click", closeVolume);
+  document.getElementById("volume-close").addEventListener("click", function (event) {
+    event.stopPropagation();
+    closeVolume();
+  });
   window.addEventListener("keydown", function (event) {
     if (event.key === "Escape") closeVolume();
   });
@@ -302,8 +333,8 @@
   if (!reduceMotion) {
     setInterval(function () {
       if (dragging || active) return;
-      targetX -= 0.35;
-      targetY -= 0.18;
+      targetX -= 0.28;
+      targetY -= 0.14;
     }, 40);
   }
 })();
