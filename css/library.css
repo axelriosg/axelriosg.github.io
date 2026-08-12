@@ -108,6 +108,7 @@ body.library.is-reading {
   height: 100%;
   display: block;
   overflow: visible;
+  pointer-events: none;
 }
 
 .hex__shape polygon {
@@ -153,7 +154,12 @@ body.library.is-reading {
 }
 
 .hex.is-dim {
-  filter: none;
+  opacity: 0.16 !important;
+}
+
+.hex.is-related .hex__n {
+  opacity: 0.8;
+  color: #650707;
 }
 
 .hex__content {
@@ -166,6 +172,7 @@ body.library.is-reading {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  pointer-events: none;
 }
 
 .hex__n {
@@ -193,21 +200,6 @@ body.library.is-reading {
   overflow: hidden;
 }
 
-.lib-hint {
-  position: fixed;
-  bottom: max(0.8rem, env(safe-area-inset-bottom));
-  left: 0;
-  right: 0;
-  z-index: 7;
-  text-align: center;
-  margin: 0;
-  font-family: Cinzel, serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  opacity: 0.38;
-  pointer-events: none;
-}
 
 .volume {
   position: fixed;
@@ -245,25 +237,33 @@ body.library.is-reading {
 }
 
 .volume__related {
-  margin: 1.1rem 0 0;
-  font-family: Cinzel, serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #650707;
+  margin: 1.15rem 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.volume__related li {
+  margin: 0;
+  border-top: 1px solid #eee;
 }
 
 .volume__related button {
   appearance: none;
   background: none;
   border: 0;
-  padding: 0.35rem 0.4rem;
+  width: 100%;
+  padding: 0.7rem 0.1rem;
   min-height: 44px;
   color: #650707;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.02rem;
+  line-height: 1.35;
+  text-align: left;
   cursor: pointer;
+}
+
+.volume__related button:hover {
   text-decoration: underline;
 }
 
@@ -289,14 +289,12 @@ body.library.is-reading {
 .lib-line {
   fill: none;
   stroke: #650707;
-  stroke-width: 1.35;
   stroke-linecap: round;
-  stroke-dasharray: 7 9;
-  animation: lib-flow 14s linear infinite;
+  stroke-linejoin: round;
 }
 
-@keyframes lib-flow {
-  to { stroke-dashoffset: -160; }
+.lib-node {
+  fill: #650707;
 }
 
 @media (max-width: 720px) {
@@ -319,10 +317,6 @@ body.library.is-reading {
     -webkit-line-clamp: 6;
   }
 
-  .lib-hint {
-    display: none;
-  }
-
   .volume {
     left: 0;
     right: 0;
@@ -338,12 +332,5 @@ body.library.is-reading {
 
   .volume__text {
     font-size: 1.28rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lib-line {
-    animation: none;
-    stroke-dasharray: none;
   }
 }

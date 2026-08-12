@@ -48,6 +48,24 @@
     return String(n).padStart(3, "0");
   }
 
+  var ALIAS = {
+    love: "amor", ama: "amor", amar: "amor", amas: "amor",
+    intelligence: "inteligencia", inteligente: "inteligencia",
+    intelligentes: "inteligencia",
+    dog: "perro", dogs: "perro", perrito: "perro", chihuahua: "perro",
+    chihuahuas: "perro",
+    book: "libro", books: "libro", libros: "libro", biblioteca: "libro",
+    death: "muerte", morir: "muerte", muero: "muerte",
+    alien: "extraterrestre", aliens: "extraterrestre",
+    extraterrestres: "extraterrestre",
+    agi: "ia", ai: "ia",
+    language: "lenguaje", lengua: "lenguaje", idiomas: "lenguaje",
+    god: "dios",
+    life: "vida", vivir: "vida",
+    human: "humano", humans: "humano", humanos: "humano",
+    latenscracia: "latenscracia"
+  };
+
   function tokens(text) {
     return text
       .toLowerCase()
@@ -56,6 +74,9 @@
       .split(/[^a-z0-9]+/)
       .filter(function (w) {
         return w.length > 3 && !STOP[w];
+      })
+      .map(function (w) {
+        return ALIAS[w] || w;
       });
   }
 
@@ -65,20 +86,31 @@
     return set;
   });
 
+  var df = {};
+  tokenSets.forEach(function (set) {
+    Object.keys(set).forEach(function (w) {
+      df[w] = (df[w] || 0) + 1;
+    });
+  });
+
   var related = thoughts.map(function (_, i) {
     var a = tokenSets[i];
     var scored = [];
     for (var j = 0; j < COUNT; j++) {
       if (j === i) continue;
       var b = tokenSets[j];
-      var shared = 0;
+      var score = 0;
+      var hits = 0;
       for (var w in a) {
-        if (b[w]) shared += 1;
+        if (b[w]) {
+          hits += 1;
+          score += 1 / (df[w] || 1);
+        }
       }
-      if (shared) scored.push({ j: j, s: shared });
+      if (hits >= 2 || score >= 0.35) scored.push({ j: j, s: score, hits: hits });
     }
     scored.sort(function (x, y) { return y.s - x.s; });
-    return scored.slice(0, 6).map(function (x) { return x.j; });
+    return scored.slice(0, 5);
   });
 
   function thoughtAt(q, r) {
@@ -166,7 +198,7 @@
     if (active) {
       var wanted = related[active.index] || [];
       for (var i = 0; i < wanted.length; i++) {
-        var copy = nearestCopy(wanted[i], active.q, active.r);
+        var copy = nearestCopy(wanted[i].j, active.q, active.r);
         if (copy.q === q && copy.r === r) rel = true;
       }
     }
@@ -190,16 +222,32 @@
     while (linesSvg.firstChild) linesSvg.removeChild(linesSvg.firstChild);
     if (!active) return;
     var from = hexCenter(active.q, active.r);
-    (related[active.index] || []).forEach(function (idx) {
-      var copy = nearestCopy(idx, active.q, active.r);
+    var links = related[active.index] || [];
+    var max = links[0] ? links[0].s : 1;
+    links.forEach(function (link, i) {
+      var copy = nearestCopy(link.j, active.q, active.r);
       var to = hexCenter(copy.q, copy.r);
-      var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("class", "lib-line");
-      line.setAttribute("x1", from.x);
-      line.setAttribute("y1", from.y);
-      line.setAttribute("x2", to.x);
-      line.setAttribute("y2", to.y);
-      linesSvg.appendChild(line);
+      var mx = (from.x + to.x) / 2;
+      var my = (from.y + to.y) / 2;
+      var dx = to.x - from.x;
+      var dy = to.y - from.y;
+      var bend = (i % 2 === 0 ? 1 : -1) * 0.16;
+      var d =
+        "M " + from.x + " " + from.y +
+        " Q " + (mx - dy * bend) + " " + (my + dx * bend) +
+        " " + to.x + " " + to.y;
+      var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("class", "lib-line");
+      path.setAttribute("d", d);
+      path.setAttribute("stroke-width", String(1.1 + (link.s / max) * 1.4));
+      path.setAttribute("stroke-opacity", String(0.45 + (link.s / max) * 0.45));
+      linesSvg.appendChild(path);
+      var node = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      node.setAttribute("class", "lib-node");
+      node.setAttribute("cx", to.x);
+      node.setAttribute("cy", to.y);
+      node.setAttribute("r", "3.2");
+      linesSvg.appendChild(node);
     });
   }
 
@@ -218,8 +266,8 @@
     }
     if (active) {
       needed[active.q + ":" + active.r] = 1;
-      (related[active.index] || []).forEach(function (idx) {
-        var copy = nearestCopy(idx, active.q, active.r);
+      (related[active.index] || []).forEach(function (link) {
+        var copy = nearestCopy(link.j, active.q, active.r);
         needed[copy.q + ":" + copy.r] = 1;
       });
     }
@@ -291,22 +339,21 @@
     volumeText.textContent = thought.text;
     var rel = related[active.index] || [];
     volumeRelated.innerHTML = "";
-    if (rel.length) {
-      volumeRelated.appendChild(document.createTextNode("connected  "));
-      rel.forEach(function (idx) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = pad(thoughts[idx].n);
-        btn.addEventListener("click", function (event) {
-          event.stopPropagation();
-          var copy = nearestCopy(idx, active.q, active.r);
-          targetX += (active.q - copy.q) * COL_STEP;
-          targetY += (active.r - copy.r) * ROW_STEP;
-          openAt(copy.q, copy.r);
-        });
-        volumeRelated.appendChild(btn);
+    rel.forEach(function (link) {
+      var item = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = excerpt(thoughts[link.j].text);
+      btn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var copy = nearestCopy(link.j, active.q, active.r);
+        targetX += (active.q - copy.q) * COL_STEP;
+        targetY += (active.r - copy.r) * ROW_STEP;
+        openAt(copy.q, copy.r);
       });
-    }
+      item.appendChild(btn);
+      volumeRelated.appendChild(item);
+    });
     volume.hidden = false;
   }
 
