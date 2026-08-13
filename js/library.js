@@ -168,7 +168,7 @@
   tick();
 
   stage.addEventListener("pointerdown", function (event) {
-    if (event.target.closest(".volume") || event.target.closest(".lib-top")) return;
+    if (event.target.closest(".volume") || event.target.closest(".leaf") || event.target.closest(".lib-top")) return;
     dragging = true;
     moved = false;
     document.body.classList.add("is-dragging");
@@ -199,27 +199,39 @@
   }, { passive: false });
 
   var volume = document.getElementById("volume");
-  var volumeN = document.getElementById("volume-n");
   var volumeText = document.getElementById("volume-text");
+  var leaf = document.getElementById("leaf");
+  var leafDate = document.getElementById("leaf-date");
+  var leafText = document.getElementById("leaf-text");
+  var months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  leafDate.textContent = now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
+  leafText.textContent = thoughts[todayIndex].text;
+
+  function closeAll() {
+    active = null;
+    volume.hidden = true;
+    leaf.hidden = true;
+    document.body.classList.remove("is-reading");
+  }
 
   function openAt(q, r) {
     var thought = thoughtAt(q, r);
     active = { q: q, r: r };
     document.body.classList.add("is-reading");
-    volumeN.textContent = thought.n === todayN ? "today" : "hexagon " + thought.n + " / " + COUNT;
+    leaf.hidden = true;
     volumeText.textContent = thought.text;
     volume.hidden = false;
   }
 
   function goToday() {
     centerOn(todayQ, todayR);
-    openAt(todayQ, todayR);
-  }
-
-  function closeVolume() {
-    active = null;
+    active = { q: todayQ, r: todayR };
+    document.body.classList.add("is-reading");
     volume.hidden = true;
-    document.body.classList.remove("is-reading");
+    leaf.hidden = false;
   }
 
   lattice.addEventListener("click", function (event) {
@@ -231,14 +243,18 @@
 
   document.getElementById("volume-close").addEventListener("click", function (event) {
     event.stopPropagation();
-    closeVolume();
+    closeAll();
+  });
+  document.getElementById("leaf-close").addEventListener("click", function (event) {
+    event.stopPropagation();
+    closeAll();
   });
   document.getElementById("lib-today").addEventListener("click", function (event) {
     event.stopPropagation();
     goToday();
   });
   window.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") closeVolume();
+    if (event.key === "Escape") closeAll();
   });
 
   goToday();

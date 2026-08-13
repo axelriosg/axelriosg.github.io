@@ -243,16 +243,71 @@ body.library.is-reading {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
 }
 
-.volume[hidden] {
+.volume[hidden],
+.leaf[hidden] {
   display: none;
 }
 
-.volume__n {
+.leaf {
+  position: fixed;
+  left: 50%;
+  bottom: max(3.4rem, calc(env(safe-area-inset-bottom) + 2.6rem));
+  transform: translateX(-50%);
+  z-index: 8;
+  width: min(38rem, calc(100% - 2rem));
+  max-height: min(70vh, 34rem);
+  overflow: auto;
+  padding: 2rem 2.1rem 1.5rem;
+  background: #fff;
+  border: 1px solid #111;
+  border-top: 2px solid #650707;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+}
+
+.leaf__kicker {
   font-family: Cinzel, serif;
   font-size: 0.68rem;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  margin: 0 0 0.9rem;
+  color: #650707;
+  margin: 0 0 0.35rem;
+}
+
+.leaf__date {
+  font-family: Cinzel, serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #111;
+  opacity: 0.42;
+  margin: 0 0 1.35rem;
+}
+
+.leaf__text {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.35rem, 2.7vw, 1.95rem);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.leaf__close {
+  margin-top: 1.35rem;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0.4rem 0.2rem;
+  min-height: 44px;
+  color: #111;
+  font-family: Cinzel, serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.leaf__close:hover {
+  text-decoration: underline;
 }
 
 .volume__text {
@@ -319,7 +374,24 @@ body.library.is-reading {
     border-bottom: 0;
   }
 
+  .leaf {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: auto;
+    max-height: 72vh;
+    padding: 1.7rem 1.25rem max(1.4rem, env(safe-area-inset-bottom));
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
   .volume__text {
     font-size: 1.28rem;
+  }
+
+  .leaf__text {
+    font-size: 1.38rem;
   }
 }
