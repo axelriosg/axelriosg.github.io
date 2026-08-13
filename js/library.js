@@ -309,27 +309,6 @@
 
   function drawLines() {
     while (linesSvg.firstChild) linesSvg.removeChild(linesSvg.firstChild);
-    if (!active || !active.doors) return;
-    var from = hexCenter(active.q, active.r);
-    var ns = "http://www.w3.org/2000/svg";
-    active.doors.forEach(function (door) {
-      var to = hexCenter(door.q, door.r);
-      var line = document.createElementNS(ns, "line");
-      line.setAttribute("class", "lib-line");
-      line.setAttribute("x1", from.x);
-      line.setAttribute("y1", from.y);
-      line.setAttribute("x2", to.x);
-      line.setAttribute("y2", to.y);
-      line.setAttribute("stroke-width", "1.15");
-      line.setAttribute("stroke-opacity", "0.7");
-      linesSvg.appendChild(line);
-      var node = document.createElementNS(ns, "circle");
-      node.setAttribute("class", "lib-node");
-      node.setAttribute("cx", to.x);
-      node.setAttribute("cy", to.y);
-      node.setAttribute("r", "3");
-      linesSvg.appendChild(node);
-    });
   }
 
   function render() {
