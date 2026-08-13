@@ -9,14 +9,15 @@
   var HEX_H = Math.round(HEX_W * 0.866);
   var COL_STEP = HEX_W * 0.75;
   var ROW_STEP = HEX_H;
+  var TILE_W = 28;
+  var TILE_H = 21;
   var COUNT = thoughts.length;
-  var DRAG_SLOP = mobile ? 14 : 6;
 
   document.documentElement.style.setProperty("--hex-w", HEX_W + "px");
   document.documentElement.style.setProperty("--hex-h", HEX_H + "px");
 
   function excerpt(text) {
-    var max = mobile ? 72 : 52;
+    var max = mobile ? 150 : 120;
     if (text.length <= max) return text;
     return text.slice(0, max).replace(/\s+\S*$/, "") + "…";
   }
@@ -35,33 +36,10 @@
     return h >>> 0;
   }
 
-  function hashCoords(q, r) {
-    var x = Math.imul(q, 374761393) + Math.imul(r, 668265263);
-    x = Math.imul(x ^ (x >>> 16), 2246822519);
-    x = Math.imul(x ^ (x >>> 13), 3266489917);
-    return (x ^ (x >>> 16)) >>> 0;
-  }
-
   function thoughtAt(q, r) {
-    return thoughts[hashCoords(q, r) % COUNT];
-  }
-
-  function findIndex(index) {
-    var q;
-    var r;
-    var layer;
-    if (hashCoords(0, 0) % COUNT === index) return { q: 0, r: 0 };
-    for (layer = 1; layer < 120; layer++) {
-      for (q = -layer; q <= layer; q++) {
-        if (hashCoords(q, -layer) % COUNT === index) return { q: q, r: -layer };
-        if (hashCoords(q, layer) % COUNT === index) return { q: q, r: layer };
-      }
-      for (r = -layer + 1; r <= layer - 1; r++) {
-        if (hashCoords(-layer, r) % COUNT === index) return { q: -layer, r: r };
-        if (hashCoords(layer, r) % COUNT === index) return { q: layer, r: r };
-      }
-    }
-    return { q: 0, r: 0 };
+    var qq = ((q % TILE_W) + TILE_W) % TILE_W;
+    var rr = ((r % TILE_H) + TILE_H) % TILE_H;
+    return thoughts[(qq + rr * TILE_W) % COUNT];
   }
 
   function isOddCol(q) {
@@ -72,9 +50,8 @@
   var dayKey = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
   var todayIndex = hashDay(dayKey) % COUNT;
   var todayN = thoughts[todayIndex].n;
-  var todayCell = findIndex(todayIndex);
-  var todayQ = todayCell.q;
-  var todayR = todayCell.r;
+  var todayQ = todayIndex % TILE_W;
+  var todayR = Math.floor(todayIndex / TILE_W);
 
   function cellLeft(q) {
     return q * COL_STEP;
@@ -94,35 +71,32 @@
   function centerOn(q, r) {
     targetX = stage.clientWidth / 2 - cellLeft(q) - HEX_W / 2;
     targetY = stage.clientHeight / 2 - cellTop(q, r) - HEX_H / 2;
-    dirty = true;
   }
 
   var panX = 0;
   var panY = 0;
   var targetX = 0;
   var targetY = 0;
+  centerOn(todayQ, todayR);
+  panX = targetX;
+  panY = targetY;
   var dragging = false;
   var moved = false;
   var lastX = 0;
   var lastY = 0;
   var active = null;
   var pool = {};
-  var dirty = true;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  centerOn(todayQ, todayR);
-  panX = targetX;
-  panY = targetY;
 
   function atmosphere(q, r) {
     var c = hexCenter(q, r);
     var dx = c.x - stage.clientWidth / 2;
     var dy = c.y - stage.clientHeight / 2;
     var dist = Math.sqrt(dx * dx + dy * dy);
-    var radius = Math.max(stage.clientWidth, stage.clientHeight) * 0.58;
+    var radius = Math.max(stage.clientWidth, stage.clientHeight) * 0.62;
     var t = Math.min(1, dist / radius);
     return {
-      opacity: Math.max(0.06, 1 - t * 1.05)
+      opacity: Math.max(0.4, 1 - t * 0.55)
     };
   }
 
@@ -186,34 +160,12 @@
   }
 
   function tick() {
-    var dx = targetX - panX;
-    var dy = targetY - panY;
-    if (dx * dx + dy * dy > 0.04) {
-      panX += dx * 0.14;
-      panY += dy * 0.14;
-      dirty = true;
-    } else if (panX !== targetX || panY !== targetY) {
-      panX = targetX;
-      panY = targetY;
-      dirty = true;
-    }
-    if (dirty) {
-      render();
-      dirty = false;
-    }
+    panX += (targetX - panX) * 0.14;
+    panY += (targetY - panY) * 0.14;
+    render();
     requestAnimationFrame(tick);
   }
   tick();
-
-  function endDrag(event) {
-    dragging = false;
-    document.body.classList.remove("is-dragging");
-    if (event && stage.releasePointerCapture) {
-      try {
-        stage.releasePointerCapture(event.pointerId);
-      } catch (err) {}
-    }
-  }
 
   stage.addEventListener("pointerdown", function (event) {
     if (event.target.closest(".volume") || event.target.closest(".leaf") || event.target.closest(".lib-top")) return;
@@ -222,30 +174,28 @@
     document.body.classList.add("is-dragging");
     lastX = event.clientX;
     lastY = event.clientY;
-    if (stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
   });
 
   window.addEventListener("pointermove", function (event) {
     if (!dragging) return;
     var dx = event.clientX - lastX;
     var dy = event.clientY - lastY;
-    if (Math.abs(dx) + Math.abs(dy) > DRAG_SLOP) moved = true;
-    if (!moved) return;
+    if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
     targetX += dx;
     targetY += dy;
     lastX = event.clientX;
     lastY = event.clientY;
-    dirty = true;
   });
 
-  window.addEventListener("pointerup", endDrag);
-  window.addEventListener("pointercancel", endDrag);
+  window.addEventListener("pointerup", function () {
+    dragging = false;
+    document.body.classList.remove("is-dragging");
+  });
 
   stage.addEventListener("wheel", function (event) {
     event.preventDefault();
     targetX -= event.deltaX || event.deltaY * 0.35;
     targetY -= event.deltaY;
-    dirty = true;
   }, { passive: false });
 
   var volume = document.getElementById("volume");
@@ -265,7 +215,6 @@
     volume.hidden = true;
     leaf.hidden = true;
     document.body.classList.remove("is-reading");
-    dirty = true;
   }
 
   function openAt(q, r) {
@@ -275,7 +224,6 @@
     leaf.hidden = true;
     volumeText.textContent = thought.text;
     volume.hidden = false;
-    dirty = true;
   }
 
   function goToday() {
@@ -284,7 +232,6 @@
     document.body.classList.add("is-reading");
     volume.hidden = true;
     leaf.hidden = false;
-    dirty = true;
   }
 
   lattice.addEventListener("click", function (event) {
@@ -292,12 +239,6 @@
     var hex = event.target.closest(".hex");
     if (!hex) return;
     openAt(Number(hex.dataset.q), Number(hex.dataset.r));
-  });
-
-  stage.addEventListener("click", function (event) {
-    if (moved || !active) return;
-    if (event.target.closest(".hex") || event.target.closest(".volume") || event.target.closest(".leaf")) return;
-    closeAll();
   });
 
   document.getElementById("volume-close").addEventListener("click", function (event) {
@@ -316,11 +257,6 @@
     if (event.key === "Escape") closeAll();
   });
 
-  window.addEventListener("resize", function () {
-    dirty = true;
-    if (active) centerOn(active.q, active.r);
-  });
-
   goToday();
 
   if (!reduceMotion) {
@@ -328,7 +264,6 @@
       if (dragging || active) return;
       targetX -= 0.28;
       targetY -= 0.14;
-      dirty = true;
     }, 40);
   }
 })();
