@@ -26,6 +26,16 @@
     return String(n).padStart(3, "0");
   }
 
+  function hashDay(s) {
+    var h = 2166136261;
+    var i;
+    for (i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
   function thoughtAt(q, r) {
     var qq = ((q % TILE_W) + TILE_W) % TILE_W;
     var rr = ((r % TILE_H) + TILE_H) % TILE_H;
@@ -36,17 +46,40 @@
     return ((q % 2) + 2) % 2 === 1;
   }
 
+  var now = new Date();
+  var dayKey = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+  var todayIndex = hashDay(dayKey) % COUNT;
+  var todayN = thoughts[todayIndex].n;
+  var todayQ = todayIndex % TILE_W;
+  var todayR = Math.floor(todayIndex / TILE_W);
+
+  function cellLeft(q) {
+    return q * COL_STEP;
+  }
+
+  function cellTop(q, r) {
+    return r * ROW_STEP + (isOddCol(q) ? HEX_H / 2 : 0);
+  }
+
   function hexCenter(q, r) {
     return {
-      x: q * COL_STEP + HEX_W / 2 + panX,
-      y: r * ROW_STEP + (isOddCol(q) ? HEX_H / 2 : 0) + HEX_H / 2 + panY
+      x: cellLeft(q) + HEX_W / 2 + panX,
+      y: cellTop(q, r) + HEX_H / 2 + panY
     };
   }
 
-  var panX = stage.clientWidth / 2 - HEX_W / 2;
-  var panY = stage.clientHeight / 2 - HEX_H / 2;
-  var targetX = panX;
-  var targetY = panY;
+  function centerOn(q, r) {
+    targetX = stage.clientWidth / 2 - cellLeft(q) - HEX_W / 2;
+    targetY = stage.clientHeight / 2 - cellTop(q, r) - HEX_H / 2;
+  }
+
+  var panX = 0;
+  var panY = 0;
+  var targetX = 0;
+  var targetY = 0;
+  centerOn(todayQ, todayR);
+  panX = targetX;
+  panY = targetY;
   var dragging = false;
   var moved = false;
   var lastX = 0;
@@ -83,14 +116,16 @@
     var thought = thoughtAt(q, r);
     var air = atmosphere(q, r);
     var isActive = !!(active && active.q === q && active.r === r);
+    var isToday = thought.n === todayN;
     el.dataset.q = String(q);
     el.dataset.r = String(r);
-    el.querySelector(".hex__n").textContent = pad(thought.n);
+    el.querySelector(".hex__n").textContent = isToday ? "today" : pad(thought.n);
     el.querySelector(".hex__text").textContent = excerpt(thought.text);
-    el.style.left = q * COL_STEP + panX + "px";
-    el.style.top = r * ROW_STEP + (isOddCol(q) ? HEX_H / 2 : 0) + panY + "px";
+    el.style.left = cellLeft(q) + panX + "px";
+    el.style.top = cellTop(q, r) + panY + "px";
     el.style.opacity = String(isActive ? 1 : air.opacity);
     el.classList.toggle("is-active", isActive);
+    el.classList.toggle("is-today", isToday);
     el.classList.toggle("is-dim", !!(active && !isActive));
     el._used = true;
   }
@@ -171,9 +206,14 @@
     var thought = thoughtAt(q, r);
     active = { q: q, r: r };
     document.body.classList.add("is-reading");
-    volumeN.textContent = "hexagon " + thought.n + " / " + COUNT;
+    volumeN.textContent = thought.n === todayN ? "today" : "hexagon " + thought.n + " / " + COUNT;
     volumeText.textContent = thought.text;
     volume.hidden = false;
+  }
+
+  function goToday() {
+    centerOn(todayQ, todayR);
+    openAt(todayQ, todayR);
   }
 
   function closeVolume() {
@@ -193,9 +233,15 @@
     event.stopPropagation();
     closeVolume();
   });
+  document.getElementById("lib-today").addEventListener("click", function (event) {
+    event.stopPropagation();
+    goToday();
+  });
   window.addEventListener("keydown", function (event) {
     if (event.key === "Escape") closeVolume();
   });
+
+  goToday();
 
   if (!reduceMotion) {
     setInterval(function () {

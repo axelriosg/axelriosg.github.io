@@ -53,6 +53,28 @@ body.library.is-reading {
   text-decoration: underline;
 }
 
+.lib-today {
+  grid-column: 3;
+  justify-self: end;
+  appearance: none;
+  background: none;
+  border: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0;
+  color: #650707;
+  font-family: Cinzel, serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lib-today:hover {
+  text-decoration: underline;
+}
+
 .lib-name {
   grid-column: 2;
   margin: 0;
@@ -146,6 +168,24 @@ body.library.is-reading {
 
 .hex.is-dim {
   opacity: 0.16 !important;
+}
+
+.hex.is-today .hex__shape polygon {
+  stroke: #650707;
+  stroke-width: 2;
+}
+
+.hex.is-today .hex__n {
+  opacity: 0.85;
+  letter-spacing: 0.2em;
+}
+
+.hex.is-today:hover .hex__shape polygon,
+.hex.is-today:focus-visible .hex__shape polygon,
+.hex.is-today.is-active .hex__shape polygon,
+.hex.is-today.is-active:hover .hex__shape polygon {
+  fill: #650707;
+  stroke: #650707;
 }
 
 .hex__content {
@@ -251,7 +291,8 @@ body.library.is-reading {
     letter-spacing: 0.16em;
   }
 
-  .lib-back {
+  .lib-back,
+  .lib-today {
     font-size: 0.64rem;
     letter-spacing: 0.2em;
   }
