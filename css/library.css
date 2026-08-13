@@ -222,67 +222,6 @@ body.library.is-reading {
   margin: 0;
 }
 
-.volume__related {
-  margin: 1.15rem 0 0;
-  padding: 0;
-  list-style: none;
-  text-align: left;
-}
-
-.volume__related .doors-lead {
-  border-top: 0;
-  padding: 0.9rem 0 0.2rem;
-  font-family: Cinzel, serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #111;
-  opacity: 0.55;
-}
-
-.volume__related button {
-  appearance: none;
-  background: none;
-  border: 0;
-  width: 100%;
-  padding: 0.75rem 0.1rem;
-  min-height: 44px;
-  color: #111;
-  text-align: left;
-  cursor: pointer;
-}
-
-.door-kind {
-  display: block;
-  font-family: Cinzel, serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #650707;
-  margin-bottom: 0.15rem;
-}
-
-.door-why {
-  display: block;
-  font-family: "Cormorant Garamond", serif;
-  font-style: italic;
-  font-size: 0.95rem;
-  color: #666;
-  margin-bottom: 0.2rem;
-}
-
-.door-text {
-  display: block;
-  font-family: "Cormorant Garamond", serif;
-  font-size: 1.02rem;
-  line-height: 1.35;
-  color: #111;
-}
-
-.volume__related button:hover {
-  text-decoration: underline;
-}
-
 .volume__close {
   margin-top: 1rem;
   appearance: none;
