@@ -87,16 +87,6 @@ body.library.is-reading {
   pointer-events: none;
 }
 
-.lib-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-  z-index: 6;
-}
-
 .hex {
   position: absolute;
   width: var(--hex-w, 176px);
@@ -142,17 +132,6 @@ body.library.is-reading {
   fill: #111;
 }
 
-.hex.is-related {
-  z-index: 4;
-  color: #650707;
-}
-
-.hex.is-related .hex__shape polygon {
-  fill: #f7f0ea;
-  stroke: #650707;
-  stroke-width: 2.2;
-}
-
 .hex.is-active,
 .hex.is-active:hover {
   z-index: 5;
@@ -167,11 +146,6 @@ body.library.is-reading {
 
 .hex.is-dim {
   opacity: 0.16 !important;
-}
-
-.hex.is-related .hex__n {
-  opacity: 0.8;
-  color: #650707;
 }
 
 .hex__content {
@@ -326,23 +300,6 @@ body.library.is-reading {
 
 .volume__close:hover {
   text-decoration: underline;
-}
-
-.lib-line {
-  fill: none;
-  stroke: #650707;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.lib-wave {
-  fill: none;
-  stroke: #650707;
-  stroke-linecap: round;
-}
-
-.lib-node {
-  fill: #650707;
 }
 
 @media (max-width: 720px) {
