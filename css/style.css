@@ -95,7 +95,7 @@
     
 }
 
-.main-article img {
+article.main-article img {
     width: 320px;
     max-width: 100%;
     height: auto;
