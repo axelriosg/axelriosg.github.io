@@ -95,6 +95,13 @@
     
 }
 
+.main-article img {
+    width: 320px;
+    max-width: 100%;
+    height: auto;
+    filter: grayscale(1);
+}
+
 .social-icon {
     color: #000000;
     transition: color 0.2s;
