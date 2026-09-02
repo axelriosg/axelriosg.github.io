@@ -97,8 +97,9 @@
 
 .main-article img {
     width: 320px;
-    max-width: 100%;
-    height: auto;
+    max-width: 320px;
+    height: 180px;
+    object-fit: cover;
     filter: grayscale(1);
 }
 
