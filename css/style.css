@@ -440,9 +440,9 @@ body.essay h2.habit {
   border: 0;
   font-family: Cinzel, serif;
   font-weight: 500;
-  font-size: clamp(1.85rem, 3.6vw, 2.35rem);
-  line-height: 1.35;
-  letter-spacing: 0.045em;
+  font-size: clamp(2.45rem, 5vw, 3.15rem);
+  line-height: 1.12;
+  letter-spacing: 0.02em;
   text-transform: none;
   text-align: left;
   color: #111;
@@ -454,7 +454,7 @@ body.essay h2.habit .habit__num {
   font-family: Cinzel, serif;
   font-style: normal;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1;
   letter-spacing: 0.34em;
 }
@@ -471,13 +471,13 @@ body.essay .pull {
   border: 0;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.75rem, 3.2vw, 2.25rem);
+  font-size: clamp(1.45rem, 2.6vw, 1.8rem);
   line-height: 1.22;
   text-align: left;
 }
 
 body.essay .pull.verse {
-  font-size: clamp(1.45rem, 2.6vw, 1.85rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
   line-height: 1.35;
 }
 
