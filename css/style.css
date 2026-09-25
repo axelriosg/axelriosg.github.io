@@ -359,7 +359,7 @@ body.essay .essay-title {
   font-family: "Essay Garamond", serif;
   font-weight: 400;
   font-size: clamp(2.7rem, 6.4vw, 4.15rem);
-  line-height: 0.96;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   text-align: left;
   margin: 0.4rem 0 1.7rem;
