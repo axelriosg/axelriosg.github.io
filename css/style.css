@@ -326,3 +326,111 @@ appearance: none;
   background: #650707;
 }
 
+/* Essay reading layout, scoped to the essay page. */
+@font-face {
+  font-family: "Essay Garamond";
+  font-style: normal;
+  font-weight: 400;
+  src: url(./fonts/cormorant-garamond-v14-latin-regular.woff2) format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Essay Garamond";
+  font-style: italic;
+  font-weight: 500;
+  src: url(./fonts/cormorant-garamond-v14-latin-500italic.woff2) format("woff2");
+  font-display: swap;
+}
+
+body.essay {
+  display: block;
+  background: #efefef;
+  color: #161616;
+}
+
+body.essay main {
+  max-width: 40rem;
+  margin: 0 auto 6rem;
+  padding: 0 1.35rem;
+}
+
+body.essay .essay-title {
+  font-family: "Essay Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(2.7rem, 6.4vw, 4.15rem);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  text-align: left;
+  margin: 0.4rem 0 1.7rem;
+  color: #111;
+}
+
+body.essay .essay-figure {
+  margin: 0 0 2.3rem;
+}
+
+body.essay .essay-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 860px) {
+  body.essay .essay-figure {
+    width: min(54rem, calc(100vw - 3rem));
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+body.essay p,
+body.essay .pull {
+  font-family: "Essay Garamond", serif;
+  font-weight: 400;
+  font-size: 1.28rem;
+  line-height: 1.55;
+  text-align: left;
+  margin: 0 0 1.15rem;
+  color: #1a1a1a;
+}
+
+body.essay .lede {
+  font-size: 1.62rem;
+  line-height: 1.32;
+  margin-bottom: 1.45rem;
+}
+
+body.essay h2.liminares {
+  font-family: Cinzel, serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: left;
+  margin: 2.8rem 0 1.15rem;
+  color: #111;
+}
+
+body.essay .pull {
+  margin: 2.15rem 0 2.3rem;
+  padding: 0;
+  border: 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.75rem, 3.2vw, 2.25rem);
+  line-height: 1.22;
+  text-align: left;
+}
+
+body.essay .pull.verse {
+  font-size: clamp(1.45rem, 2.6vw, 1.85rem);
+  line-height: 1.35;
+}
+
+body.essay .sign {
+  margin-top: 2.2rem;
+  font-style: italic;
+  font-weight: 500;
+}
+
