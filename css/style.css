@@ -440,7 +440,7 @@ body.essay h2.habit {
   border: 0;
   font-family: Cinzel, serif;
   font-weight: 500;
-  font-size: clamp(1.2rem, 2.3vw, 1.5rem);
+  font-size: clamp(1.85rem, 3.6vw, 2.35rem);
   line-height: 1.35;
   letter-spacing: 0.045em;
   text-transform: none;
@@ -450,11 +450,11 @@ body.essay h2.habit {
 
 body.essay h2.habit .habit__num {
   display: block;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.45rem;
   font-family: Cinzel, serif;
   font-style: normal;
   font-weight: 500;
-  font-size: 0.68rem;
+  font-size: 0.9rem;
   line-height: 1;
   letter-spacing: 0.34em;
 }
