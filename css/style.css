@@ -349,6 +349,15 @@ body.essay {
   color: #161616;
 }
 
+body.essay .gradient {
+  background-color: #efefef;
+  background-image: radial-gradient(
+    circle closest-side,
+    rgb(0, 0, 0),
+    #efefef
+  );
+}
+
 body.essay main {
   max-width: 40rem;
   margin: 0 auto 6rem;
