@@ -355,33 +355,56 @@ body.essay main {
   padding: 0 1.35rem;
 }
 
+body.essay .main-barrita {
+  margin-bottom: 2.4rem;
+}
+
 body.essay .essay-title {
   font-family: "Essay Garamond", serif;
   font-weight: 400;
-  font-size: clamp(2.7rem, 6.4vw, 4.15rem);
-  line-height: 1.15;
+  font-size: clamp(2.55rem, 5.6vw, 3.7rem);
+  line-height: 1.12;
   letter-spacing: -0.02em;
   text-align: left;
-  margin: 0.4rem 0 1.7rem;
+  margin: 0.2rem 0 1.45rem;
   color: #111;
 }
 
-body.essay .essay-figure {
-  margin: 0 0 2.3rem;
+body.essay .essay-figure,
+body.essay .plate {
+  margin: 0 0 2rem;
 }
 
-body.essay .essay-figure img {
+body.essay .essay-figure img,
+body.essay .plate img {
   display: block;
   width: 100%;
   height: auto;
+  filter: grayscale(1);
 }
 
-@media (min-width: 860px) {
-  body.essay .essay-figure {
-    width: min(54rem, calc(100vw - 3rem));
-    margin-left: 50%;
-    transform: translateX(-50%);
-  }
+body.essay .plate {
+  margin: 2.1rem 0 2.35rem;
+}
+
+body.essay .plate.portrait {
+  width: min(20rem, 86%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.essay .plate figcaption {
+  font-family: Cinzel, serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #555;
+  margin-top: 0.7rem;
+  text-align: left;
+}
+
+body.essay .plate.portrait figcaption {
+  text-align: center;
 }
 
 body.essay p,
